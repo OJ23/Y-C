@@ -1,0 +1,84 @@
+<% layout('./layouts/boilerplate') %>
+<link rel="stylesheet" href="/stylesheets/star.css">
+
+<div class="row">
+    <div class="col-4">
+        <div class="card mb-3" style="width: 19rem;">
+            <img src="<%=restaurants.image %>" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h2 class="card-title"><%=restaurants.title %></h5>
+              <p class="card-text"><%=restaurants.description %></p>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Submitted by <%=restaurants.author.username %></li>
+              <li class="list-group-item"><%=restaurants.location %></li>
+              <li class="list-group-item">$<%=restaurants.price %>/night</li>
+              <li class="list-group-item">A third item</li>
+            </ul>
+            <% if(currentUser && restaurants.author.equals(currentUser._id)){ %>
+            <div class="card-body">
+              <p></p><a href="/restaurants/<%= restaurants._id%>/edit" class="card-link" btn btn-warning>EDIT</a></p>
+              <p>
+                  <form class="d-inline" action="/restaurants/<%= restaurants._id %>?_method=DELETE" method="post">
+                      <ul><button class="btn btn-danger">DELETE</button></ul>
+                  </form>
+              </p>
+            </div> 
+            <% } %>
+        </div>
+    </div>
+    <div class="col-6">
+      <% if(currentUser){ %>
+        <div class="card mb-3">
+          <form action="/restaurants/<%=restaurants._id%>/reviews" method="post" class="mb-3 needs-validation" novalidate >
+            <h2>leave a review</h2>
+            <div class="mb-3">
+              <fieldset class="starability-fade">
+                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
+                <input type="radio" id="second-rate1" name="review[rating]" value="1" />
+                <label for="second-rate1" title="Terrible">1 star</label>
+                <input type="radio" id="second-rate2" name="review[rating]" value="2" />
+                <label for="second-rate2" title="Not good">2 stars</label>
+                <input type="radio" id="second-rate3" name="review[rating]" value="3" />
+                <label for="second-rate3" title="Average">3 stars</label>
+                <input type="radio" id="second-rate4" name="review[rating]" value="4" />
+                <label for="second-rate4" title="Very good">4 stars</label>
+                <input type="radio" id="second-rate5" name="review[rating]" value="5" />
+                <label for="second-rate5" title="Amazing">5 stars</label>
+              </fieldset>
+            </div>
+            <div class="card-body mb-3">
+              <label class="form-label" for="body">Review</label>
+              <textarea class="form-control" name="review[body]" id="body" required></textarea>
+            </div>
+            <div class="valid-feedback">
+              "looks good!"
+            </div>
+            <button class="btn btn-success">SUBMIT</button>
+            <p class="card-footer text-muted">3 days ago </p>
+              <p><a href="/restaurants">ALL RESTAURANTS</a></p>
+        </form>
+        <% } %>
+        <% for( let review of restaurants.reviews ) { %>
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Reviewd By: <%= review.author.username%> </h5>
+                 <p class="starability-result" data-rating="<%= review.rating %>">
+                   Rated: <%= review.rating %>
+                   </p>
+            <h5 class="card-subtitle">RATING: <%= review.rating %></h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+            <h5 class="card-text">REVIEW: <%= review.body %></h5>
+            <% if(currentUser && review.author.equals(currentUser._id)){ %>
+            <form action="/restaurants/<%=restaurants._id%>/reviews/<%=review._id%>?_method=DELETE" method="Post">
+              <button class="btn btn-danger btn-sm">DELETE</button>
+            </form>
+            <% } %>
+          </div> 
+        </div> 
+        <% } %>
+      </div>
+    </div>
+</div>
+
+
+    

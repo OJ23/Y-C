@@ -1,0 +1,77 @@
+<% layout('./layouts/boilerplate') %>
+
+    <div class="row">
+        <h1 class="text-center">New restaurant</h1>
+        <div class="col-6 offset-3">
+            <h1>add a new restaurant</h1>
+            <form action="/restaurants" method="post" enctype="multipart/form-data" novalidate class="needs-validation" >
+                <p>
+                    <div class="mb-3">
+                        <label class="form-label" for="title">Title: </label>
+                        <input class="form-control" type="text" id= "title" name="restaurants[title]" required>
+                    </div>
+                    <div class="valid-feedback">
+                        "looks good!"
+                    </div>
+                </p>
+                <p>
+                    <div class="mb-3">
+                        <label class="form-label" for="description">Description:</label>
+                        <textarea class="form-control" type="text" id= "description" name="restaurants[description]" required></textarea>
+                    </div>
+                    <div class="valid-feedback">
+                        "looks good!"
+                    </div>
+                </p>
+                <p>
+                    <div class="mb-3">
+                        <label class="form-label" for="rating">Rating: </label>
+                        <input class="form-control" type="text" id= "rating" name="restaurants[rating]" required>
+                    </div>
+                    <div class="valid-feedback">
+                        "looks good!"
+                    </div>
+                </p>
+                    <div>
+                    <input type="file" name="images" multiple>
+                </div>
+
+                <!-- <p>
+                    <div class="mb-3">
+                        <label class="form-label" for="location">Location:</label>
+                        <input class="form-control" type="text" id= "location" name="restaurants[location]" required>
+                    </div>
+                    <div class="valid-feedback">
+                        "looks good!"
+                    </div>
+                </p> -->
+               <!-- <div class="mb-3">
+                        <label class="form-label" for="image">image:</label>
+                        <input class="form-control" type="text" id= "image" name="restaurants[image]" required>
+                        <div class="valid-feedback">
+                            looks good!
+                        </div>
+                </div> -->
+                <!-- <p>
+                    <input type="file" name="image" id="">
+                </p> -->
+                <p>
+                    <div class="mb-3">
+                        <label class="form-label" for="price">Price:</label>
+                        <input class="form-control" type="text" id= "price" name="restaurants[price]" required>
+                    </div>
+                    <div class="valid-feedback">
+                        "looks good!"
+                    </div>
+                </p>
+                    <div class="mb-3">
+                        <button class="btn btn-success"> ADD RESTAURANT</button>
+                        <p><a href="/restaurants">HOME</a></p>
+                    </div>
+                    <div class="valid-feedback">
+                        "looks good!"
+                    </div>
+            </form>
+
+        </div>
+    </div>
