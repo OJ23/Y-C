@@ -5,10 +5,10 @@ module.exports.restaurantsValid = joi.object({
       description: joi.string().required(),
       rating: joi.number().required().min(0),
       location: joi.string().required(),
-      image: joi.string().required(),
+      // image: joi.string().required(),
       price: joi.number().required().min(0)
-
-    }).required()
+    }).required(),
+    deleteImages: joi.array()
 });
 module.exports.reviewsValid = joi.object({
     review: joi.object({

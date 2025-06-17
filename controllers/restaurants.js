@@ -1,4 +1,6 @@
+const restaurant = require('../models/restaurant');
 const restaurantSchema = require('../models/restaurant');
+const {cloudinary} = require('../cloudinary/index');
 
 
 module.exports.index = async(req, res) =>{
@@ -13,17 +15,11 @@ module.exports.newForm = async(req,res)=>{
 
 module.exports.createRestaurant = async(req,res,next)=>{
         const restaurant = new restaurantSchema(req.body.restaurants);
+        restaurant.images = req.files.map(f =>({url: f.path, filename: f.filename}));
         restaurant.author = req.user._id;
         console.log(restaurant.author);
-        console.log('📁 req.file:', req.file);
-        console.log('📦 req.body:', req.body);
-
-
-            if (req.file) {
-            // req.file.path contains the Cloudinary URL
-            restaurant.image = req.file.path; 
-            }
         await restaurant.save();
+        console.log(restaurant)
         req.flash('success','you made a new farm');
         res.redirect(`/restaurants/${restaurant._id}`);
 }
@@ -50,9 +46,20 @@ module.exports.renderEdit = async(req,res)=>{
 
 module.exports.editRestaurant = async(req,res)=>{
       const {id} = req.params;
-      const rests  = await restaurantSchema.findByIdAndUpdate(id, {...req.body.restaurants}, {runValidators:true, new:true});
-      req.flash('success','you made a new farm')
-      res.redirect(`/restaurants/${rests._id}`);
+      console.log(req.body)
+      const restaurant  = await restaurantSchema.findByIdAndUpdate(id, {...req.body.restaurants}, {runValidators:true, new:true});
+      const imgs = req.files.map(f =>({url: f.path, filename: f.filename}));
+      restaurant.images.push(...imgs);
+      await restaurant.save();
+      if(req.body.deleteImages){
+            for(let filename of req.body.deleteImages){
+                  await cloudinary.uploader.destroy(filename);
+            }
+            await restaurant.updateOne({$pull:{images: {filename:{$in:req.body.deleteImages}}}});
+            console.log(restaurant);
+      }
+      req.flash('success','you made a new farm');
+      res.redirect(`/restaurants/${restaurant._id}`);
 }
 
 module.exports.deleteRestaurant = async(req,res)=>{

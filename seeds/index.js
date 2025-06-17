@@ -23,9 +23,19 @@ const seedDB = async () => {
             location: `${cities[random10].city}, ${cities[random10].state}`,
             rating: Math.floor(Math.random()*5),
             price: Math.floor(Math.random()*100),
-            image: `https://picsum.photos/400?random=${Math.random()}`    
+            images: [
+                {
+                url: 'https://res.cloudinary.com/dzdt4kihv/image/upload/v1749036566/YC/o2rwgsmzmblbsbln7tpf.jpg',
+                filename: 'YC/o2rwgsmzmblbsbln7tpf'
+                },
+                {
+                url: 'https://res.cloudinary.com/dzdt4kihv/image/upload/v1749036567/YC/r1mgknvfyi0tdtw8z48g.jpg',
+                filename: 'YC/r1mgknvfyi0tdtw8z48g',
+                }
+            ]
         })
     await spot.save();
+    console.log(spot);
     }}
 seedDB().then(() => {
     mongoose.connection.close();
