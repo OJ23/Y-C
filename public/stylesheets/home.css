@@ -1,0 +1,45 @@
+body{
+    height: 100vh;
+    background-image: url("/images/IMG_0391.JPG");
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.5);
+}
+
+.cover-container{
+    max-width: 80vw;
+}
+
+.nav-link {
+    font-weight: 700;
+    color:firebrick;
+    border-bottom: 0.2rem solid transparent;
+
+}
+.nav-link:hover{
+    color: purple;
+    border-bottom-color:blue ;
+}
+.btn-secondary{
+    color:black
+}
+
+.btn-secondary:hover{
+    color:brown
+}
+
+.nav-link:active{
+    color: red;
+    border-bottom-color: aliceblue;
+}
+h3{
+    color:firebrick;
+}
+main{
+    color: firebrick;
+    font-weight: 700;
+}
+.lead {
+    font-size: 1.25rem;
+    font-weight: 700;
+}

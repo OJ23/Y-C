@@ -7,30 +7,38 @@
 </head>
 <body>
     <% layout('./layouts/boilerplate') %>
-    <h1>USER</h1>
-    <form action="/register" method="post" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label class="form-label" for="Username">Username:</label>
-                <textarea class="form-control" type="text" id= "Username" name="username" required></textarea>
-                <div class="valid-feedback">
-                    "looks good!"
+    <div class="container d-flex justify-content-center align-items-center mt-0">
+            <div class="col-md-4 offset-md-0">
+                <div class="card shadow">
+                    <img src="/images/IMG_3686.JPG" alt="" class="card-img-top">
+                    <div class="card-body">
+                    <h5 class="card-title">RESGISTER:</h5>
+                    <form action="/register" method="post" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label" for="Username">Username:</label>
+                            <textarea class="form-control" type="text" id= "Username" name="username"  autofocus required></textarea>
+                            <div class="valid-feedback">
+                            "looks good!"
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="Password">Password:</label>
+                            <textarea class="form-control" type="text" id= "Password" name="password" required></textarea>
+                            <div class="valid-feedback">
+                                "looks good!"
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="Email">Email:</label>
+                            <textarea class="form-control" type="text" id= "Email" name="email" required></textarea>
+                            <div class="valid-feedback">
+                                "looks good!"
+                            </div>
+                        </div>
+                        <button class="btn btn-success w-100">REGISTER</button>
+                    </form>
                 </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="Password">Password:</label>
-                <textarea class="form-control" type="text" id= "Password" name="password" required></textarea>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="Email">Email:</label>
-                <textarea class="form-control" type="text" id= "Email" name="email" required></textarea>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </div>
-            <button class="btn btn-success">REGISTER</button>
-    </form>
+    </div>
 </body>
 </html>
