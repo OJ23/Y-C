@@ -1,7 +1,8 @@
-const { types } = require('joi');
+const { types, required } = require('joi');
 const mongoose = require('mongoose');
 const  Schema = mongoose.Schema;
 const Review = require('./review');
+const { coordinates } = require('@maptiler/client');
 
 
 
@@ -20,6 +21,17 @@ const restaurantSchema = new Schema({
     location : String,
     images : [imageSchema],
     price : Number,
+    geometry: {
+        type:{
+            type: String,
+            enum: ['Point'],
+            required: true
+        },
+        coordinates:{
+            type: [Number],
+            required: true
+        }
+    },
     author:{
         type: Schema.Types.ObjectId,
         ref: 'User'
@@ -31,7 +43,7 @@ const restaurantSchema = new Schema({
             
         }
     ]
-})
+});
 
 // const restaurantSchema = new Schema({
 //     title: { type: String, required: true },

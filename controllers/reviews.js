@@ -4,7 +4,6 @@ const restaurantSchema = require('../models/restaurant');
 
 module.exports.createReview = async(req,res)=>{
     const restaurant = await restaurantSchema.findById(req.params.id);
-    console.log(req.body)
     const review = new reviewSchema(req.body.review)
     console.log(req.body);
     restaurant.reviews.push(review);

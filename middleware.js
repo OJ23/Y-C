@@ -6,14 +6,9 @@ const reviewSchema = require('./models/review.js');
 const restaurantSchema = require('../campgrounds/models/restaurant.js');
 
 
-
-
 const isLoggedIn = (req,res,next)=>{
-
-console.log('2')
     console.log('isLoggedIn check:', req.isAuthenticated());
     if (!req.isAuthenticated()) {
-      console.log(req.originalUrl)
       req.session.returnTo = req.originalUrl; 
       req.flash('error', 'you must be signed in')
       return res.redirect('/login');
@@ -29,7 +24,6 @@ const storeReturnTo = (req, res, next) => {
 }
 
 const validateRestaurant = (req,res,next) =>{
-  console.log('3')
     const {error} = restaurantsValid.validate(req.body);
     if(error){
       console.log("💬 req.body:", req.body);

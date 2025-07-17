@@ -1,4 +1,6 @@
 <% layout('./layouts/boilerplate') %>
+
+<div id="map" style="width: 100%; height: 350px;"></div>
     <h1>Restaurant</h1>
 
     <ul>
@@ -6,7 +8,11 @@
             <div class="card mb-3">
                 <div class="row">
                     <div class="col-md-4">
+                        <% if(restaurant.images && restaurant.images.length){ %>
                        <img class="img-fluid" src="<%= restaurant.images[0].url %>" alt="">
+                        <%} else{  %>
+                             <img class="img-fluid" src="" alt="">
+                        <% } %>
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -27,3 +33,9 @@
             </div>
         <% } %>
     </ul>
+<script defer>
+  window.mapToken = '<%= process.env.MAPTILER_API_KEY %>';
+  window.restaurantsData = <%- JSON.stringify(restaurants) %>;
+  console.log(window.restaurantsData)
+</script>
+<script src="/javascripts/clusterMap.js" defer></script>

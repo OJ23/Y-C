@@ -31,16 +31,17 @@ const passport = require('passport');
 const localStrategy = require('passport-local');
 const User = require('./models/user.js');
 const multer = require('multer');
+const mongoSanitize = require('express-mongo-sanitize');
 
 
-app.use((req, res, next) => {
-  console.log(`📥 Received ${req.method} request to ${req.originalUrl}`);
-  next();
-});
-app.post('*', (req, res, next) => {
-  console.log('🔥 Caught POST to:', req.originalUrl);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`📥 Received ${req.method} request to ${req.originalUrl}`);
+//   next();
+// });
+// app.post('*', (req, res, next) => {
+//   console.log('🔥 Caught POST to:', req.originalUrl);
+//   next();
+// });
 
 
 
@@ -53,11 +54,13 @@ mongoose.connect('mongodb://127.0.0.1/YP')
     });
 
 const sessionOptions = {
+  name: 'blah',
   secret:'notagoodsecret',
   resave:false, 
   saveUninitialized: false,
   cookie:{
     httpOnly: true,
+    // secure:true, // this is so noone can gain access if it isnt https
     expires: Date.now()+ 1000 * 60*60*24*7,
     maxAge: 1000 * 60*60*24*7
   }
@@ -67,10 +70,12 @@ app.set('view engine','ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
+app.use(express.static('public')); // In your main app file
 app.use(methodOverride('_method'));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
+app.use(mongoSanitize());
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -109,7 +114,7 @@ app.use((err, req, res, next) => {
     console.error("💥 Multer error:", err);
     req.flash('error', 'File upload failed: ' + err.message);
     // Redirect back or render an error page:
-    return res.redirect('back'); 
+    return res.send('multer error default page'); 
   }
 
   // General error handling:

@@ -1,5 +1,3 @@
-console.log("✅ restaurantRoutes file loaded");
-
 
 
 const express = require('express');
@@ -21,12 +19,12 @@ const logAfterMulter = (req, res, next) => {
   next();
 };
 
-const logBeforeMulter = (req, res, next) => {
-  console.log('🌟 before multer');
-  console.log(req.body);
-  console.log(req.files);
-  next();
-};
+// const logBeforeMulter = (req, res, next) => {
+//   console.log('🌟 before multer');
+//   console.log(req.body);
+//   console.log(req.files);
+//   next();
+// };
 
 router.route('/')
   .get(catchAsync(restaurant.index))
