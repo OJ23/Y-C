@@ -1,10 +1,2 @@
-
 <% layout('./layouts/boilerplate') %>
-
-<div class="alert alert-danger" role="alert">
-  <h4 class="alert-heading"><%= err.message %></h4>
-    <%if(process.env.NODE_ENV !== "production"){ %>
-      <p><%= err.stack %></p>
-    <% } %>
-  <hr>
-</div>
+<section class="error-page page-shell"><span class="error-code"><%= err.statusCode || 500 %></span><p class="eyebrow">Something went wrong</p><h1><%= err.message || 'We could not load this table.' %></h1><p>Try returning to discovery. If the issue continues, restart the server and check the terminal output.</p><a class="button button-primary" href="/restaurants">Back to discovery</a><% if(process.env.NODE_ENV !== 'production') { %><details><summary>Technical details</summary><pre><%= err.stack %></pre></details><% } %></section>

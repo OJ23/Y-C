@@ -1,142 +1,71 @@
-// maptilersdk.config.apiKey = maptilerApiKey;
-
 maptilersdk.config.apiKey = window.mapToken;
-const restaurants = window.restaurantsData
-// console.log(maptilersdk.config.apiKey,restaurants[0].location)
-// console.log(restaurants[2].location)
-console.log(restaurants)
-const restaurantsGeoJSON = {
+
+const validRestaurants = (window.restaurantsData || []).filter(item => item.geometry && Array.isArray(item.geometry.coordinates));
+const restaurantGeoJSON = {
   type: 'FeatureCollection',
-  features: window.restaurantsData.map(item => ({
+  features: validRestaurants.map(item => ({
     type: 'Feature',
     geometry: item.geometry,
     properties: {
-      _id: item._id,
-      title: item.title,
-      description: item.description,
-      rating: item.rating
+      id: String(item._id),
+      title: item.title || 'Restaurant',
+      location: item.location || 'Location not listed',
+      rating: item.rating || 'New'
     }
   }))
 };
 
-
-const map = new maptilersdk.Map({
-    container: 'map',
-    style: maptilersdk.MapStyle.BRIGHT,
-    center: [9.0820, 8.6753],
-    zoom: 4
+window.restaurantMap = new maptilersdk.Map({
+  container: 'map',
+  style: maptilersdk.MapStyle.STREETS.PASTEL,
+  center: validRestaurants.length ? validRestaurants[0].geometry.coordinates : [9.082, 8.6753],
+  zoom: validRestaurants.length ? 11 : 4,
+  navigationControl: true,
+  geolocateControl: true
 });
 
-map.on('load', function () {
-    map.addSource('restaurants', {
-        type: 'geojson',
-        data: restaurantsGeoJSON,
-        cluster: true,
-        clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
-    });
+window.restaurantMap.on('load', () => {
+  window.restaurantMap.addSource('restaurants', {
+    type: 'geojson',
+    data: restaurantGeoJSON,
+    cluster: true,
+    clusterMaxZoom: 14,
+    clusterRadius: 48
+  });
+  window.restaurantMap.addLayer({
+    id: 'clusters', type: 'circle', source: 'restaurants', filter: ['has', 'point_count'],
+    paint: { 'circle-color': '#174f3b', 'circle-radius': ['step', ['get', 'point_count'], 18, 10, 23, 30, 29], 'circle-stroke-width': 4, 'circle-stroke-color': '#ffffff' }
+  });
+  window.restaurantMap.addLayer({
+    id: 'cluster-count', type: 'symbol', source: 'restaurants', filter: ['has', 'point_count'],
+    layout: { 'text-field': '{point_count_abbreviated}', 'text-size': 12 }, paint: { 'text-color': '#ffffff' }
+  });
+  window.restaurantMap.addLayer({
+    id: 'restaurant-point', type: 'circle', source: 'restaurants', filter: ['!', ['has', 'point_count']],
+    paint: { 'circle-color': '#d7664f', 'circle-radius': 8, 'circle-stroke-width': 4, 'circle-stroke-color': '#ffffff' }
+  });
 
-    map.addLayer({
-        id: 'clusters',
-        type: 'circle',
-        source: 'restaurants',
-        filter: ['has', 'point_count'],
-        paint: {
-            // Use step expressions (https://docs.maptiler.com/gl-style-specification/expressions/#step)
-            // with three steps to implement three types of circles:
-            'circle-color': [
-                'step',
-                ['get', 'point_count'],
-                '#00BCD4',
-                10,
-                '#2196F3',
-                30,
-                '#3F51B5'
-            ],
-            'circle-radius': [
-                'step',
-                ['get', 'point_count'],
-                15,
-                10,
-                20,
-                30,
-                25
-            ]
-        }
-    });
-
-    map.addLayer({
-        id: 'cluster-count',
-        type: 'symbol',
-        source: 'restaurants',
-        filter: ['has', 'point_count'],
-        layout: {
-            'text-field': '{point_count_abbreviated}',
-            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-            'text-size': 12
-        }
-    });
-
-    map.addLayer({
-        id: 'unclustered-point',
-        type: 'circle',
-        source: 'restaurants',
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-            'circle-color': '#11b4da',
-            'circle-radius': 5,
-            'circle-stroke-width': 3,
-            'circle-stroke-color': '#fff'
-        }
-    });
-
-    // inspect a cluster on click
-    map.on('click', 'clusters', async (e) => {
-        const features = map.queryRenderedFeatures(e.point, {
-            layers: ['clusters']
-        });
-        const clusterId = features[0].properties.cluster_id;
-        const zoom = await map.getSource('restaurants').getClusterExpansionZoom(clusterId);
-        map.easeTo({
-            center: features[0].geometry.coordinates,
-            zoom
-        });
-    });
-
-    // When a click event occurs on a feature in
-    // the unclustered-point layer, open a popup at
-    // the location of the feature, with
-    // description HTML from its properties.
-    map.on('click', 'unclustered-point', function (e) {
-        const {_id , title, description} = e.features[0].properties;
-        const coordinates = e.features[0].geometry.coordinates.slice();
-        console.log(e.features[0])
-
-        // Ensure that if the map is zoomed out such that
-        // multiple copies of the feature are visible, the
-        // popup appears over the copy being pointed to.
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-        const popUpMarkup = `
-            <a href="/restaurants/${_id}" style="text-decoration:none; color:#007BFF;">
-                <strong>${title}</strong>
-            </a>
-            <p>${description.substring(0,35)}...`;
-
-        new maptilersdk.Popup()
-            .setLngLat(coordinates)
-            .setHTML(popUpMarkup)
-            .addTo(map);
-    });
-
-    map.on('mouseenter', 'clusters', () => {
-        map.getCanvas().style.cursor = 'pointer';
-    });
-    map.on('mouseleave', 'clusters', () => {
-        map.getCanvas().style.cursor = '';
-    });
-     map.on('mouseenter', 'unclustered-point', () => {
-        map.getCanvas().style.cursor = 'pointer';
-    });
+  window.restaurantMap.on('click', 'clusters', async event => {
+    const feature = window.restaurantMap.queryRenderedFeatures(event.point, { layers: ['clusters'] })[0];
+    const zoom = await window.restaurantMap.getSource('restaurants').getClusterExpansionZoom(feature.properties.cluster_id);
+    window.restaurantMap.easeTo({ center: feature.geometry.coordinates, zoom });
+  });
+  window.restaurantMap.on('click', 'restaurant-point', event => {
+    const feature = event.features[0];
+    const popup = document.createElement('div');
+    popup.className = 'map-popup';
+    const title = document.createElement('strong');
+    title.textContent = feature.properties.title;
+    const location = document.createElement('p');
+    location.textContent = `${feature.properties.location} · ${feature.properties.rating} rating`;
+    const link = document.createElement('a');
+    link.href = `/restaurants/${feature.properties.id}`;
+    link.textContent = 'View restaurant';
+    popup.append(title, location, link);
+    new maptilersdk.Popup({ offset: 12 }).setLngLat(feature.geometry.coordinates).setDOMContent(popup).addTo(window.restaurantMap);
+  });
+  ['clusters', 'restaurant-point'].forEach(layer => {
+    window.restaurantMap.on('mouseenter', layer, () => { window.restaurantMap.getCanvas().style.cursor = 'pointer'; });
+    window.restaurantMap.on('mouseleave', layer, () => { window.restaurantMap.getCanvas().style.cursor = ''; });
+  });
 });

@@ -1,41 +1,41 @@
 <% layout('./layouts/boilerplate') %>
 
-<div id="map" style="width: 100%; height: 350px;"></div>
-    <h1>Restaurant</h1>
+<section class="discover-header page-shell">
+  <div><p class="eyebrow">Restaurant discovery</p><h1><%= query ? 'Results for “' + query + '”' : 'Find your next table' %></h1><p><%= restaurants.length %> <%= restaurants.length === 1 ? 'place' : 'places' %> to explore</p></div>
+  <% if (currentUser) { %><a class="button button-secondary" href="/restaurants/new"><i data-lucide="plus" aria-hidden="true"></i>Add a restaurant</a><% } %>
+</section>
 
-    <ul>
-        <% for (let restaurant of restaurants) {%>
-            <div class="card mb-3">
-                <div class="row">
-                    <div class="col-md-4">
-                        <% if(restaurant.images && restaurant.images.length){ %>
-                       <img class="img-fluid" src="<%= restaurant.images[0].url %>" alt="">
-                        <%} else{  %>
-                             <img class="img-fluid" src="" alt="">
-                        <% } %>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title"> <%= restaurant.title %></h5>
-                            <p class="card-text"><%= restaurant.description %></p>
-                            <p class="card-text">
-                                <small class="text-muted"><%= restaurant.location %></small>
-                            </p>
-                            <a href="restaurants/<%= restaurant._id %>" class="btn btn-primary"> view <%= restaurant.title %></a>
-                            <p>
-                                <form class="d-inline" action="/restaurants/<%= restaurant._id %>?_method=DELETE" method="post">
-                                    <ul><button class="btn btn-danger">DELETE</button></ul>
-                                </form>
-                            </p>                           
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <% } %>
-    </ul>
-<script defer>
+<div class="discovery-tools page-shell">
+  <form class="discover-search" action="/restaurants" method="get" role="search">
+    <label class="sr-only" for="discover-search">Search restaurants</label><i data-lucide="search" aria-hidden="true"></i>
+    <input id="discover-search" name="q" type="search" value="<%= query %>" placeholder="Restaurant, food, or neighborhood">
+    <% if (query) { %><a class="clear-search" href="/restaurants" aria-label="Clear search"><i data-lucide="x" aria-hidden="true"></i></a><% } %>
+    <button class="button button-primary" type="submit">Search</button>
+  </form>
+  <div class="filter-row" aria-label="Quick filters">
+    <% ['Near me', 'Highly rated', 'Budget friendly', 'Open late'].forEach(filter => { %><a class="filter-chip" href="/restaurants?q=<%= encodeURIComponent(filter) %>"><%= filter %></a><% }) %>
+  </div>
+  <div class="view-toggle" role="group" aria-label="Results view">
+    <button class="is-active" type="button" data-view="list"><i data-lucide="list" aria-hidden="true"></i>List</button>
+    <button type="button" data-view="map"><i data-lucide="map" aria-hidden="true"></i>Map</button>
+  </div>
+</div>
+
+<section class="results-layout" data-results-layout>
+  <div class="results-panel" data-results-panel>
+    <% if (restaurants.length) { %>
+      <div class="results-list">
+        <% restaurants.forEach((restaurant, index) => { %><%- include('../components/restaurant-card', { restaurant, index }) %><% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state"><i data-lucide="search-x" aria-hidden="true"></i><h2>No places found</h2><p>Try a restaurant name, neighborhood, or a broader phrase.</p><a class="button button-secondary" href="/restaurants">Clear search</a></div>
+    <% } %>
+  </div>
+  <aside class="map-panel" aria-label="Restaurant map" data-map-panel><div id="map" class="discovery-map"></div><div class="map-caption"><i data-lucide="info" aria-hidden="true"></i><span>The result list provides an accessible alternative to the map.</span></div></aside>
+</section>
+
+<script>
   window.mapToken = '<%= process.env.MAPTILER_API_KEY %>';
-  window.restaurantsData = <%- JSON.stringify(restaurants) %>;
-  console.log(window.restaurantsData)
+  window.restaurantsData = <%- JSON.stringify(restaurants).replace(/</g, '\\u003c') %>;
 </script>
 <script src="/javascripts/clusterMap.js" defer></script>

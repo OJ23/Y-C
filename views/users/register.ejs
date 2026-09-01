@@ -1,44 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <% layout('./layouts/boilerplate') %>
-    <div class="container d-flex justify-content-center align-items-center mt-0">
-            <div class="col-md-4 offset-md-0">
-                <div class="card shadow">
-                    <img src="/images/IMG_3686.JPG" alt="" class="card-img-top">
-                    <div class="card-body">
-                    <h5 class="card-title">RESGISTER:</h5>
-                    <form action="/register" method="post" class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label class="form-label" for="Username">Username:</label>
-                            <textarea class="form-control" type="text" id= "Username" name="username"  autofocus required></textarea>
-                            <div class="valid-feedback">
-                            "looks good!"
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="Password">Password:</label>
-                            <textarea class="form-control" type="text" id= "Password" name="password" required></textarea>
-                            <div class="valid-feedback">
-                                "looks good!"
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="Email">Email:</label>
-                            <textarea class="form-control" type="text" id= "Email" name="email" required></textarea>
-                            <div class="valid-feedback">
-                                "looks good!"
-                            </div>
-                        </div>
-                        <button class="btn btn-success w-100">REGISTER</button>
-                    </form>
-                </div>
-            </div>
-    </div>
-</body>
-</html>
+<% layout('./layouts/boilerplate') %>
+<section class="auth-page">
+  <div class="auth-image"><img src="/images/discovery-hero.jpg" alt="Friends sharing dinner at a city restaurant" width="900" height="1200"><div><p class="eyebrow eyebrow-light">A personal dining map</p><blockquote>Find somewhere new. Remember everywhere that mattered.</blockquote></div></div>
+  <div class="auth-form-wrap"><form class="auth-form" action="/register" method="post"><a class="brand auth-brand" href="/"><span class="brand-mark">S</span><span>Savour</span></a><p class="eyebrow"><%= isBootstrapAdmin ? 'Super admin setup' : 'Join Savour' %></p><h1><%= isBootstrapAdmin ? 'Create the super admin.' : 'Start your dining history.' %></h1><p class="auth-lede"><%= isBootstrapAdmin ? 'This first account will receive full administrative access.' : 'Save discoveries and keep the details you want to remember.' %></p><div class="field"><label for="username">Username</label><input id="username" name="username" type="text" autocomplete="username" autofocus required></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div><div class="field"><label for="password">Password</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required><button type="button" aria-label="Show password" data-password-toggle><i data-lucide="eye" aria-hidden="true"></i></button></div><span class="field-hint">Use at least 8 characters.</span></div><button class="button button-primary button-full" type="submit"><%= isBootstrapAdmin ? 'Create super admin' : 'Create account' %></button><p class="auth-switch">Already have an account? <a href="/login">Log in</a></p></form></div>
+</section>

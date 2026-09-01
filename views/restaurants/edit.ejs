@@ -1,83 +1,10 @@
 <% layout('./layouts/boilerplate') %>
-<div class="row">
-    <div class="col-md-6 offset-md-3">
-    <div class="card shadow">
-    <div class="card-body">
-    <h4 class="card-title">EDIT A RESTAURANT:</h4>
-        <form action="/restaurants/<%= restaurants._id %>?_method=PUT" method="post" novalidate class="needs-validation" enctype="multipart/form-data">
-            <p>
-                <div class="mb-3">
-                    <label class="form-label" for="title">Title: </label>
-                    <input class="form-control" type="text" id= "title" name="restaurants[title]" value="<%= restaurants.title %>" required>
-                </div>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </p>
-            <p>
-                <div class="mb-3">
-                    <label class="form-label" for="description">Description:</label>
-                    <textarea class="form-control" type="text" id= "description" name="restaurants[description]" required> <%= restaurants.description %></textarea>
-                </div>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </p>
-            <p>
-                <div class="mb-3">
-                    <label class="form-label" for="rating">Rating: </label>
-                    <input class="form-control" type="text" id= "rating" name="restaurants[rating]" value="<%= restaurants.rating %>" required>
-                </div>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </p>
-            <p>
-                <div class="mb-3">
-                    <label class="form-label" for="location">Location:</label>
-                    <input class="form-control" type="text" id= "location" name="restaurants[location]" value="<%= restaurants.location %>" required>
-                </div>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </p>
-            <p>
-                <div class="mb-3">
-                    <label for="formFileMultiple" class="form-label">Upload images:</label>
-                    <input class="form-control" type="file" id="formFileMultiple" name="images" multiple>
-                </div>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </p>
-            <p>
-                <div class="mb-3">
-                    <label class="form-label" for="price">Price:</label>
-                    <input class="form-control" type="text" id= "price" name="restaurants[price]" value="<%= restaurants.price %>" required>
-                </div>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-            </p>
-            <div class="mb-3">
-                <% restaurants.images.forEach((img, i) => { %>
-                    <img src="<%= img.thumbnail %>" alt="" srcset="" class="img-thumbnail">
-                    <div class="form-check-inline">
-                        <input type="checkbox" name="deleteImages[]" id="image-<%= i %>" value="<%= img.filename%>">
-                    </div>
-                    <label for="image-<%= i %>">DELETE</label>
-                <% })%>
-            </div>
-                <div class="mb-3">
-                    <button class="btn btn-info w-100"> UPDATE RESTAURANT</button>
-                    <p><a href="/restaurants">HOME</a></p>
-                    <p><a href="/restaurants/<%=restaurants._id %>"><-Back</a></p>
-                </div>
-                <div class="valid-feedback">
-                    "looks good!"
-                </div>
-        </form>
-    </div>
-    </div>
-    </div>
-</div>
+<section class="form-page page-shell">
+  <div class="form-intro"><a class="back-link" href="/restaurants/<%= restaurants._id %>"><i data-lucide="arrow-left" aria-hidden="true"></i>Back to restaurant</a><p class="eyebrow">Directory management</p><h1>Edit <%= restaurants.title %></h1><p>Keep the shared restaurant record accurate and useful for everyone.</p></div>
+  <form class="editor-form" action="/restaurants/<%= restaurants._id %>?_method=PUT" method="post" enctype="multipart/form-data" novalidate data-validate>
+    <div class="field-grid"><div class="field field-wide"><label for="title">Restaurant name</label><input id="title" name="restaurants[title]" type="text" value="<%= restaurants.title %>" required></div><div class="field field-wide"><label for="location">Location</label><input id="location" name="restaurants[location]" type="text" value="<%= restaurants.location %>" required></div><div class="field field-wide"><label for="description">Description</label><textarea id="description" name="restaurants[description]" rows="6" required><%= restaurants.description %></textarea></div><div class="field"><label for="rating">Rating</label><input id="rating" name="restaurants[rating]" type="number" min="0" max="5" step="0.1" value="<%= restaurants.rating %>" required></div><div class="field"><label for="price">Price level</label><select id="price" name="restaurants[price]" required><% for(let i=1; i<=4; i++) { %><option value="<%= i %>" <%= restaurants.price === i ? 'selected' : '' %>><%= '$'.repeat(i) %></option><% } %></select></div></div>
+    <% if (restaurants.images && restaurants.images.length) { %><fieldset class="image-manager"><legend>Current photos</legend><div class="image-manager-grid"><% restaurants.images.forEach((img, i) => { %><label class="managed-image"><img src="<%= img.thumbnail %>" alt="Existing image <%= i + 1 %> for <%= restaurants.title %>"><span><input type="checkbox" name="deleteImages[]" value="<%= img.filename %>">Remove photo</span></label><% }) %></div></fieldset><% } %>
+    <div class="upload-field"><i data-lucide="image-plus" aria-hidden="true"></i><div><label for="images">Add new photos</label><p>Up to two images per upload.</p></div><input id="images" type="file" name="images" accept="image/jpeg,image/png,image/webp" multiple></div>
+    <div class="form-actions"><a class="button button-ghost" href="/restaurants/<%= restaurants._id %>">Cancel</a><button class="button button-primary" type="submit">Save changes</button></div>
+  </form>
+</section>

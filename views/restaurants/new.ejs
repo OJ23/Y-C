@@ -1,68 +1,13 @@
 <% layout('./layouts/boilerplate') %>
-
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card shadow">
-                <div class="card-body">
-                <h4 class="card-title">ADD A RESTAURANT:</h4>
-                <form action="/restaurants" method="post" enctype="multipart/form-data" novalidate class="needs-validation" >
-                    <p>
-                        <div class="mb-3">
-                            <label class="form-label" for="title">Title: </label>
-                            <input class="form-control" type="text" id= "title" name="restaurants[title]" required>
-                        </div>
-                        <div class="valid-feedback">
-                            "looks good!"
-                        </div>
-                    </p>
-                    <p>
-                        <div class="mb-3">
-                            <label class="form-label" for="description">Description:</label>
-                            <textarea class="form-control" type="text" id= "description" name="restaurants[description]" required></textarea>
-                        </div>
-                        <div class="valid-feedback">
-                            "looks good!"
-                        </div>
-                    </p>
-                    <p>
-                        <div class="mb-3">
-                            <label class="form-label" for="rating">Rating: </label>
-                            <input class="form-control" type="text" id= "rating" name="restaurants[rating]" required>
-                        </div>
-                        <div class="valid-feedback">
-                            "looks good!"
-                        </div>
-                    </p>
-                    <div>
-                        <input type="file" name="images" multiple>
-                    </div>
-                    <p>
-                        <div class="mb-3">
-                            <label class="form-label" for="location">Location:</label>
-                            <input class="form-control" type="text" id= "location" name="restaurants[location]" required>
-                        </div>
-                        <div class="valid-feedback">
-                            "looks good!"
-                        </div>
-                    </p>
-                    <p>
-                        <div class="mb-3">
-                            <label class="form-label" for="price">Price:</label>
-                            <input class="form-control" type="text" id= "price" name="restaurants[price]" required>
-                        </div>
-                        <div class="valid-feedback">
-                            "looks good!"
-                        </div>
-                    </p>
-                    <p>
-                        <div class="mb-3">
-                            <button class="btn btn-success w-100"> ADD RESTAURANT</button>
-                        </div>
-                        <div class="valid-feedback">
-                            "looks good!"
-                        </div>
-                    </p>
-                </form>
-            </div>
-        </div>
-    </div>
+<section class="form-page page-shell">
+  <div class="form-intro"><a class="back-link" href="/restaurants"><i data-lucide="arrow-left" aria-hidden="true"></i>Back to discovery</a><p class="eyebrow">Community directory</p><h1>Add a place worth knowing</h1><p>Share accurate details so other diners can discover it. Once submitted, the restaurant becomes part of the shared directory.</p></div>
+  <form class="editor-form" action="/restaurants" method="post" enctype="multipart/form-data" novalidate data-validate>
+    <div class="form-section"><span class="form-step">01</span><div><h2>The basics</h2><p>Start with the name and where to find it.</p></div></div>
+    <div class="field-grid"><div class="field field-wide"><label for="title">Restaurant name</label><input id="title" name="restaurants[title]" type="text" placeholder="e.g. Nok by Alara" required><span class="field-error">Enter the restaurant name.</span></div><div class="field field-wide"><label for="location">Location</label><div class="input-with-icon"><i data-lucide="map-pin" aria-hidden="true"></i><input id="location" name="restaurants[location]" type="text" placeholder="Street, neighborhood, city" required></div><span class="field-hint">A precise location helps us place it on the map.</span></div></div>
+    <div class="form-section"><span class="form-step">02</span><div><h2>What makes it special?</h2><p>A concise, useful description for fellow diners.</p></div></div>
+    <div class="field-grid"><div class="field field-wide"><label for="description">Description</label><textarea id="description" name="restaurants[description]" rows="6" placeholder="Tell people about the food, atmosphere, and what stands out." required></textarea><span class="field-error">Add a short description.</span></div><div class="field"><label for="rating">Rating</label><input id="rating" name="restaurants[rating]" type="number" min="0" max="5" step="0.1" placeholder="4.5" required></div><div class="field"><label for="price">Price level</label><select id="price" name="restaurants[price]" required><option value="">Choose a level</option><option value="1">$ · Budget friendly</option><option value="2">$$ · Moderate</option><option value="3">$$$ · Special occasion</option><option value="4">$$$$ · Premium</option></select></div></div>
+    <div class="form-section"><span class="form-step">03</span><div><h2>Add photos</h2><p>Show the food or the atmosphere. Up to two images.</p></div></div>
+    <div class="upload-field"><i data-lucide="image-plus" aria-hidden="true"></i><div><label for="images">Choose restaurant photos</label><p>JPG, PNG, or WebP. Clear, well-lit images work best.</p></div><input id="images" type="file" name="images" accept="image/jpeg,image/png,image/webp" multiple></div>
+    <div class="form-actions"><a class="button button-ghost" href="/restaurants">Cancel</a><button class="button button-primary" type="submit">Add to directory<i data-lucide="arrow-right" aria-hidden="true"></i></button></div>
+  </form>
+</section>

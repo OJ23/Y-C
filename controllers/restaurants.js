@@ -5,8 +5,21 @@ const maptilerClient = require("../mapTiler/index");
 
 
 module.exports.index = async(req, res) =>{
-    const restaurants = await restaurantSchema.find({});
-    res.render('restaurants/index', {restaurants});
+    const query = (req.query.q || '').trim();
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const filter = query ? {
+      $or: [
+        { title: { $regex: escapedQuery, $options: 'i' } },
+        { description: { $regex: escapedQuery, $options: 'i' } },
+        { location: { $regex: escapedQuery, $options: 'i' } }
+      ]
+    } : {};
+    const restaurants = await restaurantSchema.find(filter);
+    res.render('restaurants/index', {
+      restaurants,
+      query,
+      pageTitle: query ? `Results for ${query}` : 'Discover restaurants'
+    });
 }
 
 module.exports.newForm = async(req,res)=>{

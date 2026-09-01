@@ -1,23 +1,6 @@
-<% if (message &&  message.length) {%>
-<div class="alert alert-success  alert-dismissible fade show">
-   <%= message %>
-   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-
+<% if (message && message.length) { %>
+  <div class="flash flash-success" role="status"><i data-lucide="circle-check" aria-hidden="true"></i><span><%= message %></span><button type="button" aria-label="Dismiss message" data-dismiss-flash><i data-lucide="x" aria-hidden="true"></i></button></div>
 <% } %>
-
-<% if (signal &&  signal.length) {%>
-   <div class="alert alert-danger  alert-dismissible fade show">
-      <%= signal %>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-   </div>
-   
+<% if ((signal && signal.length) || (error && error.length)) { %>
+  <div class="flash flash-error" role="alert"><i data-lucide="circle-alert" aria-hidden="true"></i><span><%= signal && signal.length ? signal : error %></span><button type="button" aria-label="Dismiss message" data-dismiss-flash><i data-lucide="x" aria-hidden="true"></i></button></div>
 <% } %>
-
-<% if (error &&  error.length) {%>
-   <div class="alert alert-danger  alert-dismissible fade show">
-      <%= error %>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-   </div>
-<% } %>
-

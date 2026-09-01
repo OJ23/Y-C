@@ -6,7 +6,7 @@ const { storeReturnTo } = require('../middleware');
 const user = require ('../controllers/users');
 
 router.route('/register')
-    .get(user.getRegister )
+    .get(catchAsync(user.getRegister))
     .post(catchAsync(user.createUser));
 
 router.route('/login')

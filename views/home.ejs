@@ -1,47 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YELP RESTAURANTS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="../stylesheets/home.css">
-</head>
-<body class="d-flex text-center text-white ">
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-        <header class="mb-auto">
-            <div class="d-flex justify-content-between align-items-center">
-                <h3 class=" float-md-left mb-0">RESTAURANTS</h3>
-                <nav class="nav nav-masthead justify-content-center">
-                    <a class="nav-link active" aria-current="page" href="#">HOMEeee</a>
-                    <a class="nav-link" href="/restaurants"> RESTAURANTS</a>
-                    <% if (!currentUser){ %>
-                    <a class="nav-link" href="/login"> LOGIN</a>
-                    <a class="nav-link" href="/register"> REGISTER</a>
-                    <% }else{  %>
-                    <a class="nav-link" href="/logout"> LOGOUT</a>
-                    <% } %>
-                </nav>
-            </div>
-        </header>
-        <main class="px-3">
-            <h1>Y_C</h1>
-            <p class="lead"> Welcome to Restaurant Cafe <br>
-                🍽️ You're Invited! <br>
-                Join us for a delightful dining experience at [Restaurant Name]!
-                Enjoy great food, warm company, and a relaxing atmosphere.
-            </p>
-            <a href="/restaurants" class="btn btn-secondary btn-lg font-weight-bold "> VIEW RESTAURANTS</a>
-        </main>
-        <footer class="mt-auto text-white-50">
-            <p>&copy; 2025 Y_C</p>
-        </footer>
+<% layout('./layouts/boilerplate') %>
+
+<section class="discovery-hero" data-hero-slider aria-roledescription="carousel" aria-label="Abuja dining scenes">
+  <div class="hero-slides" aria-live="off">
+    <img class="hero-media hero-slide is-active" src="/images/discovery-hero.jpg" alt="Friends dining at a welcoming city restaurant in the evening" width="1536" height="864" fetchpriority="high" data-hero-slide>
+    <img class="hero-media hero-slide" src="/images/hero-dining-conversation.jpg" alt="Two diners talking over a meal in a plant-filled restaurant" width="1400" height="1120" data-hero-slide>
+    <img class="hero-media hero-slide" src="/images/hero-slide-3.jpg" alt="An intimate dinner inside a modern Nigerian restaurant" width="1536" height="864" data-hero-slide>
+    <img class="hero-media hero-slide" src="/images/hero-rooftop-terrace.jpg" alt="A sunlit rooftop restaurant terrace with tables and greenery" width="1400" height="1120" data-hero-slide>
+    <img class="hero-media hero-slide" src="/images/hero-slide-5.jpg" alt="Friends meeting for brunch at a contemporary Abuja cafe" width="1536" height="864" data-hero-slide>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content page-shell">
+    <p class="eyebrow eyebrow-light">Your next great meal is nearby</p>
+    <h1>Find somewhere worth remembering.</h1>
+    <p class="hero-copy">Explore local restaurants, keep the places you love, and build a history of every table worth returning to.</p>
+    <form class="hero-search" action="/restaurants" method="get" role="search">
+      <label class="sr-only" for="home-search">Search restaurants, food, or location</label>
+      <i data-lucide="search" aria-hidden="true"></i>
+      <input id="home-search" name="q" type="search" placeholder="Try “spicy food for a relaxed dinner”" autocomplete="off">
+      <button type="submit">Explore</button>
+    </form>
+    <div class="prompt-list" aria-label="Popular searches">
+      <% ['Late-night food', 'Good for dates', 'Hidden gems', 'Near me'].forEach(prompt => { %><a href="/restaurants?q=<%= encodeURIComponent(prompt) %>"><%= prompt %></a><% }) %>
     </div>
-    
+  </div>
+  <div class="hero-slider-controls" aria-label="Slideshow controls">
+    <button class="hero-control" type="button" aria-label="Previous image" data-hero-prev><i data-lucide="chevron-left" aria-hidden="true"></i></button>
+    <div class="hero-dots" role="group" aria-label="Choose background image">
+      <% for (let slide = 0; slide < 5; slide++) { %><button type="button" aria-label="Show image <%= slide + 1 %>" aria-current="<%= slide === 0 ? 'true' : 'false' %>" data-hero-dot="<%= slide %>"></button><% } %>
+    </div>
+    <button class="hero-control" type="button" aria-label="Next image" data-hero-next><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+  </div>
+</section>
 
+<section class="section page-shell" aria-labelledby="nearby-title">
+  <div class="section-heading">
+    <div><p class="eyebrow">Freshly added</p><h2 id="nearby-title">Places to start with</h2></div>
+    <a class="arrow-link" href="/restaurants">See all places <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+  </div>
+  <% if (recentRestaurants && recentRestaurants.length) { %>
+    <div class="restaurant-grid"><% recentRestaurants.forEach((restaurant, index) => { %><%- include('./components/restaurant-card', { restaurant, index }) %><% }) %></div>
+  <% } else { %>
+    <div class="empty-state"><i data-lucide="utensils" aria-hidden="true"></i><h3>Your dining map starts here</h3><p>Add the first restaurant you would recommend to a friend.</p><% if (currentUser) { %><a class="button button-primary" href="/restaurants/new">Add a restaurant</a><% } else { %><a class="button button-primary" href="/register">Create an account</a><% } %></div>
+  <% } %>
+</section>
 
-
-      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-</body>
-</html>
+<section class="journal-band">
+  <div class="page-shell journal-layout">
+    <div class="journal-copy"><p class="eyebrow eyebrow-light">Your dining journal</p><h2>Remember more than the rating.</h2><p>Keep track of the dishes, conversations, and little details that made a place matter.</p><a class="button button-light" href="<%= currentUser ? '/restaurants?view=visited' : '/login' %>">Open your journal</a></div>
+    <div class="memory-list" aria-label="Journal examples">
+      <article><span>01</span><div><h3>The dish</h3><p>What you ordered and what you would return for.</p></div></article>
+      <article><span>02</span><div><h3>The moment</h3><p>A date, a celebration, or a quiet meal on your own.</p></div></article>
+      <article><span>03</span><div><h3>The place</h3><p>Your personal map of restaurants across the city.</p></div></article>
+    </div>
+  </div>
+</section>

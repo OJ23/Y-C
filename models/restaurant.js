@@ -19,6 +19,18 @@ const restaurantSchema = new Schema({
     description : String,
     rating : Number,
     location : String,
+    category: String,
+    venueType: String,
+    cuisine: String,
+    phone: String,
+    website: String,
+    openingHours: String,
+    hotelStars: Number,
+    source: {
+        provider: String,
+        url: String,
+        notabilityScore: Number
+    },
     images : [imageSchema],
     price : Number,
     geometry: {

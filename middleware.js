@@ -34,6 +34,9 @@ const validateRestaurant = (req,res,next) =>{
     }
   }
 const isAuthor = async(req,res,next) =>{
+    if (req.user.role === 'superAdmin') {
+      return next();
+    }
     const {id} = req.params;
     const restaurant = await restaurantSchema.findById(id)
       if(!restaurant.author.equals(req.user._id)){
@@ -44,6 +47,9 @@ const isAuthor = async(req,res,next) =>{
 }
 
 const isReviewAuthor = async(req,res,next) =>{
+    if (req.user.role === 'superAdmin') {
+      return next();
+    }
     const {id,reviewId} = req.params;
     const review = await reviewSchema.findById(reviewId);
       if(!review.author.equals(req.user._id)){

@@ -1,44 +1,19 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Y-P</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/restaurants/new">NEW RESTAURANT</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Dropdown
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/views/restaurants/edit.ejs">EDIT</a></li>
-              <li><a class="dropdown-item" href="/views/restaurants/new.ejs">NEW</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-          </li>
-        </ul>
-        <div class="navbar-nav ml-auto">
-          <%  if(!currentUser){ %>
-          <a class="nav-link" href ="/login">LOGIN</a>
-          <a class="nav-link" href ="/register">REGISTER</a>
-          <% }else{ %>
-          <a class="nav-link" href ="/logout">LOGOUT</a>
-          <% } %>
-        </div>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      </div>
+<header class="site-header">
+  <div class="nav-shell">
+    <a class="brand" href="/" aria-label="Savour home"><span class="brand-mark">S</span><span>Savour</span></a>
+    <button class="icon-button nav-toggle" type="button" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false" data-nav-toggle><i data-lucide="menu" aria-hidden="true"></i><span class="menu-fallback" aria-hidden="true"></span></button>
+    <nav class="primary-nav" id="primary-nav" aria-label="Primary navigation" data-nav>
+      <a class="<%= currentPath === '/' ? 'is-active' : '' %>" href="/">Discover</a>
+      <a class="<%= currentPath.startsWith('/restaurants') && currentPath !== '/restaurants/new' ? 'is-active' : '' %>" href="/restaurants">Explore map</a>
+      <% if (currentUser) { %><a href="/restaurants?view=visited">Visited</a><a href="/restaurants?view=saved">Saved</a><% } %>
+    </nav>
+    <div class="nav-actions">
+      <% if (!currentUser) { %>
+        <a class="text-button" href="/login">Log in</a><a class="button button-primary button-small" href="/register">Create account</a>
+      <% } else { %>
+        <a class="icon-button" href="/restaurants/new" aria-label="Add restaurant" title="Add restaurant"><i data-lucide="plus" aria-hidden="true"></i></a>
+        <span class="user-greeting"><%= currentUser.username %><%= currentUser.role === 'superAdmin' ? ' · Admin' : '' %></span><a class="text-button" href="/logout">Log out</a>
+      <% } %>
     </div>
-  </nav>
+  </div>
+</header>

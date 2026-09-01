@@ -1,7 +1,8 @@
 const User = require('../models/user');
 
-module.exports.getRegister = (req,res) => {
-    res.render('users/register')
+module.exports.getRegister = async (req,res) => {
+    const isBootstrapAdmin = await User.countDocuments({}) === 0;
+    res.render('users/register', { isBootstrapAdmin })
 }
 module.exports.getLogin = (req,res)=>{
     res.render('users/login')
@@ -9,11 +10,20 @@ module.exports.getLogin = (req,res)=>{
 module.exports.createUser = async(req,res,next)=>{
     try{
     const {email,username,password} = req.body;
-    const user = new User({email,username});
+    // After an account reset, the first person to register becomes the
+    // super admin. Later registrations remain ordinary users.
+    const isFirstUser = await User.countDocuments({}) === 0;
+    const user = new User({
+        email,
+        username,
+        role: isFirstUser ? 'superAdmin' : 'user'
+    });
     const registeredUser = await User.register(user,password);
     req.login(registeredUser, err=>{
         if(err) return next(err);
-            req.flash('success','welcome to YP');
+            req.flash('success', isFirstUser
+                ? 'Welcome! Your super admin account has been created.'
+                : 'Welcome to YP');
             res.redirect('/restaurants');
     })
     }catch(err){

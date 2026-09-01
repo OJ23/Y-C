@@ -32,6 +32,8 @@ const localStrategy = require('passport-local');
 const User = require('./models/user.js');
 const multer = require('multer');
 const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+const Restaurant = require('./models/restaurant.js');
 
 
 // app.use((req, res, next) => {
@@ -43,8 +45,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 //   next();
 // });
 
-
-
+// const dbUrl = process.env.DB_URL
 mongoose.connect('mongodb://127.0.0.1/YP')
     .then(()=> {
       console.log('Connected to the database')  
@@ -65,6 +66,42 @@ const sessionOptions = {
     maxAge: 1000 * 60*60*24*7
   }
 }
+
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    // "https://api.tiles.mapbox.com/",
+    // "https://api.mapbox.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdnjs.cloudflare.com/",
+    "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/",
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    // "https://api.mapbox.com/",
+    // "https://api.tiles.mapbox.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+    "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/",
+];
+const connectSrcUrls = [
+    // "https://api.mapbox.com/",
+    // "https://a.tiles.mapbox.com/",
+    // "https://b.tiles.mapbox.com/",
+    // "https://events.mapbox.com/",
+    "https://api.maptiler.com/",
+    "https://*.maptiler.com/",
+    "https://*.tiles.maptiler.com/",
+    "https://cdn.jsdelivr.net/",
+];
+const fontSrcUrls = [
+  "https://cdn.maptiler.com/",
+  "https://fonts.gstatic.com/",
+  "https://fonts.openmaptiles.org/"
+];
+
 app.use(session(sessionOptions));
 app.set('view engine','ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -76,6 +113,29 @@ app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
 app.use(mongoSanitize());
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives:{
+      defaultSrc:["'self'"],
+      connectSrc:["'self'", ...connectSrcUrls],
+      scriptSrc:["'unsafe-inline'","'self'", ...scriptSrcUrls],
+      styleSrc:["'self'","'unsafe-inline'", ...styleSrcUrls],
+      workerSrc:["'self'","blob:"],
+      objectSrc:[],
+      imgSrc: [
+              "'self'",
+              "blob:",
+              "data:",
+              "https://res.cloudinary.com/dzdt4kihv/",//should match your cloudinary acct
+
+                "https://api.maptiler.com/",
+                "https://*.maptiler.com/",
+              ],
+      fontSrc:["'self'",...fontSrcUrls],
+    }
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -89,6 +149,7 @@ app.use((req, res, next) => {
   res.locals.error = req.flash('error');
   res.locals.signal = req.flash('signal'); // optional, if you're using this elsewhere
   res.locals.currentUser = req.user;
+  res.locals.currentPath = req.path;
   next();
 });
 
@@ -100,8 +161,13 @@ app.use('/',userRoutes);
 
 
 
-app.get('/', (req, res) => {
-    res.render('Home');
+app.get('/', async (req, res, next) => {
+  try {
+    const recentRestaurants = await Restaurant.find({}).sort({ _id: -1 }).limit(3);
+    res.render('home', { recentRestaurants, pageTitle: 'Discover restaurants worth remembering' });
+  } catch (error) {
+    next(error);
+  }
 });
 
 
@@ -125,6 +191,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render('error', { err });
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+const port = process.env.PORT || 5173;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
