@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Savour",
+    "slug": "savour",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "savour",
+    "splash": {
+      "backgroundColor": "#174f3b"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.savour.app"
+    },
+    "android": {
+      "package": "com.savour.app"
+    },
+    "extra": {
+      "apiUrl": "http://10.0.2.2:5173"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-splash-screen",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Savour to select food and restaurant photos you choose to share.",
+          "cameraPermission": "Allow Savour to take food and restaurant photos you choose to share."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Savour to use your location while browsing to recommend nearby food and restaurants."
+        }
+      ]
+    ]
+  }
+}
