@@ -1,22 +1,17 @@
 (function () {
   if (window.lucide) window.lucide.createIcons();
 
-  const navToggle = document.querySelector('[data-nav-toggle]');
-  const nav = document.querySelector('[data-nav]');
-  if (navToggle && nav) {
-    navToggle.addEventListener('click', () => {
-      const isOpen = nav.classList.toggle('is-open');
-      navToggle.setAttribute('aria-expanded', String(isOpen));
-      navToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
-      document.body.classList.toggle('nav-open', isOpen);
-    });
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && nav.classList.contains('is-open')) navToggle.click();
-    });
-  }
+  document.querySelectorAll('.flash').forEach(flash => {
+    let removalTimer;
+    const dismiss = () => {
+      if (!flash.isConnected || flash.classList.contains('is-hiding')) return;
+      window.clearTimeout(removalTimer);
+      flash.classList.add('is-hiding');
+      window.setTimeout(() => flash.remove(), 220);
+    };
 
-  document.querySelectorAll('[data-dismiss-flash]').forEach(button => {
-    button.addEventListener('click', () => button.closest('.flash').remove());
+    flash.querySelector('[data-dismiss-flash]')?.addEventListener('click', dismiss);
+    removalTimer = window.setTimeout(dismiss, 5000);
   });
 
   const toast = document.querySelector('#app-toast');
@@ -64,35 +59,32 @@
     startAutoplay();
   }
 
-  document.querySelectorAll('[data-save-restaurant]').forEach(button => {
-    const key = `savour:saved:${button.dataset.saveRestaurant}`;
-    const setSaved = saved => {
-      button.setAttribute('aria-pressed', String(saved));
-      const label = button.querySelector('span');
-      if (label) label.textContent = saved ? 'Saved' : 'Save';
-    };
-    setSaved(localStorage.getItem(key) === 'true');
-    button.addEventListener('click', () => {
-      const saved = button.getAttribute('aria-pressed') !== 'true';
-      localStorage.setItem(key, String(saved));
-      setSaved(saved);
-      showToast(saved ? 'Saved to this browser.' : 'Removed from saved places.');
-    });
-  });
-
-  document.querySelectorAll('[data-visited-restaurant]').forEach(button => {
-    const key = `savour:visited:${button.dataset.visitedRestaurant}`;
+  document.querySelectorAll('[data-visited-form]').forEach(form => {
+    const button = form.querySelector('[data-visited-restaurant]');
+    if (!button) return;
     const setVisited = visited => {
       button.setAttribute('aria-pressed', String(visited));
       const label = button.querySelector('span');
       if (label) label.textContent = visited ? 'Visited' : 'Mark visited';
     };
-    setVisited(localStorage.getItem(key) === 'true');
-    button.addEventListener('click', () => {
-      const visited = button.getAttribute('aria-pressed') !== 'true';
-      localStorage.setItem(key, String(visited));
-      setVisited(visited);
-      showToast(visited ? 'Added to your local visit history.' : 'Removed from visit history.');
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      button.disabled = true;
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(form))
+        });
+        if (!response.ok) throw new Error('Visit update failed');
+        const { visited } = await response.json();
+        setVisited(visited);
+        showToast(visited ? 'Added to your visits.' : 'Removed from your visits.');
+      } catch (error) {
+        showToast('Could not update your visits. Please try again.');
+      } finally {
+        button.disabled = false;
+      }
     });
   });
 
@@ -124,6 +116,115 @@
     control.addEventListener('click', event => {
       event.preventDefault();
       showToast('This journal feature is next on the roadmap.');
+    });
+  });
+
+  document.querySelectorAll('[data-search-suggest]').forEach(form => {
+    const input = form.querySelector('input[type="search"]');
+    const suggestions = form.querySelector('[data-search-suggestions]');
+    if (!input || !suggestions) return;
+
+    let timer;
+    let request;
+    let activeIndex = -1;
+
+    const closeSuggestions = () => {
+      suggestions.hidden = true;
+      suggestions.replaceChildren();
+      input.setAttribute('aria-expanded', 'false');
+      activeIndex = -1;
+    };
+
+    const selectSuggestion = item => {
+      input.value = item.value;
+      closeSuggestions();
+      form.requestSubmit();
+    };
+
+    const showSuggestions = items => {
+      suggestions.replaceChildren();
+      activeIndex = -1;
+      items.forEach(item => {
+        const button = document.createElement('button');
+        const label = document.createElement('strong');
+        const detail = document.createElement('span');
+        button.type = 'button';
+        button.className = 'search-suggestion';
+        button.setAttribute('role', 'option');
+        label.textContent = item.label;
+        detail.textContent = item.detail;
+        button.append(label, detail);
+        button.addEventListener('click', () => selectSuggestion(item));
+        suggestions.append(button);
+      });
+      suggestions.hidden = items.length === 0;
+      input.setAttribute('aria-expanded', String(items.length > 0));
+    };
+
+    input.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      if (request) request.abort();
+      const query = input.value.trim();
+      if (query.length < 2) return closeSuggestions();
+      timer = window.setTimeout(async () => {
+        request = new AbortController();
+        try {
+          const response = await fetch(`${form.dataset.searchSuggest}?q=${encodeURIComponent(query)}`, { signal: request.signal });
+          if (!response.ok) throw new Error('Suggestion request failed');
+          showSuggestions(await response.json());
+        } catch (error) {
+          if (error.name !== 'AbortError') closeSuggestions();
+        }
+      }, 180);
+    });
+
+    input.addEventListener('keydown', event => {
+      const options = [...suggestions.querySelectorAll('.search-suggestion')];
+      if (!options.length || suggestions.hidden) return;
+      if (event.key === 'Escape') return closeSuggestions();
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        activeIndex = event.key === 'ArrowDown'
+          ? (activeIndex + 1) % options.length
+          : (activeIndex - 1 + options.length) % options.length;
+        options.forEach((option, index) => option.classList.toggle('is-active', index === activeIndex));
+        options[activeIndex].scrollIntoView({ block: 'nearest' });
+      } else if (event.key === 'Enter' && activeIndex >= 0) {
+        event.preventDefault();
+        options[activeIndex].click();
+      }
+    });
+
+    input.addEventListener('blur', () => window.setTimeout(closeSuggestions, 150));
+  });
+
+  const recipeCategoryTabs = [...document.querySelectorAll('[data-recipe-category]')];
+  const recipeGroups = [...document.querySelectorAll('[data-recipe-group]')];
+  const recipeCategoryEmpty = document.querySelector('[data-recipe-category-empty]');
+  recipeCategoryTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const category = tab.dataset.recipeCategory;
+      let visibleGroups = 0;
+      recipeCategoryTabs.forEach(item => {
+        const active = item === tab;
+        item.classList.toggle('is-active', active);
+        item.setAttribute('aria-selected', String(active));
+      });
+      recipeGroups.forEach(group => {
+        const visible = category === 'All' || group.dataset.recipeGroup === category;
+        group.hidden = !visible;
+        if (visible) visibleGroups += 1;
+      });
+      if (recipeCategoryEmpty) recipeCategoryEmpty.hidden = visibleGroups !== 0;
+    });
+  });
+
+  const savedTabs = [...document.querySelectorAll('[data-saved-tab]')];
+  const savedPanels = [...document.querySelectorAll('[data-saved-panel]')];
+  savedTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      savedTabs.forEach(item => item.setAttribute('aria-selected', String(item === tab)));
+      savedPanels.forEach(panel => { panel.hidden = panel.dataset.savedPanel !== tab.dataset.savedTab; });
     });
   });
 

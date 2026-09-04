@@ -1,5 +1,6 @@
 const baseJoi = require('joi');
 const sanitizeHTML = require('sanitize-html');
+const { restaurantTags, mealTags } = require('./data/restaurantTags');
 
 const extension = (joi) =>({
     type: 'string',
@@ -30,10 +31,13 @@ module.exports.restaurantsValid = joi.object({
       description: joi.string().required().escapeHTML(),
       rating: joi.number().required().min(0),
       location: joi.string().required().escapeHTML(),
+      tags: joi.array().items(joi.string().valid(...restaurantTags)).single().default([]),
+      mealTags: joi.array().items(joi.string().valid(...mealTags)).single().default([]),
       // image: joi.string().required(),
       price: joi.number().required().min(0)
     }).required(),
-    deleteImages: joi.array()
+    markVisited: joi.boolean().truthy('on').falsy('').default(false),
+    deleteImages: joi.array().items(joi.string().escapeHTML())
 });
 module.exports.reviewsValid = joi.object({
     review: joi.object({

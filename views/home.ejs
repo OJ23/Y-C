@@ -1,5 +1,29 @@
 <% layout('./layouts/boilerplate') %>
 
+<% if (currentUser) { %>
+<% const defaultSavedTab = requestedSavedTab || (savedRecipes.length ? 'dishes' : savedRestaurants.length ? 'places' : 'moments'); %>
+<section class="member-home" aria-labelledby="member-home-title">
+  <div class="recommendation-banner">
+    <div class="page-shell recommendation-banner-inner"><div><p class="eyebrow eyebrow-light">Recommendations</p><h1 id="member-home-title">Welcome back, <%= currentUser.username %>.</h1><p>Your personalized food and restaurant recommendations are being prepared.</p></div><span>Coming later</span></div>
+  </div>
+  <div class="page-shell saved-home" id="bookmarks">
+    <div class="saved-home-heading"><div><p class="eyebrow">Your bookmarks</p><h2>Saved for your next meal.</h2></div><a class="button button-primary button-small" href="/restaurants/new"><i data-lucide="plus" aria-hidden="true"></i>Create</a></div>
+    <div class="saved-tabs" role="tablist" aria-label="Saved content">
+      <button type="button" role="tab" aria-selected="<%= defaultSavedTab === 'moments' %>" aria-controls="saved-moments" data-saved-tab="moments">Moments <span>0</span></button>
+      <button type="button" role="tab" aria-selected="<%= defaultSavedTab === 'dishes' %>" aria-controls="saved-dishes" data-saved-tab="dishes">Dishes <span><%= savedRecipes.length %></span></button>
+      <button type="button" role="tab" aria-selected="<%= defaultSavedTab === 'places' %>" aria-controls="saved-places" data-saved-tab="places">Places <span><%= savedRestaurants.length %></span></button>
+    </div>
+    <div class="saved-panel" id="saved-moments" role="tabpanel" data-saved-panel="moments" <%= defaultSavedTab !== 'moments' ? 'hidden' : '' %>><div class="saved-empty"><i data-lucide="utensils" aria-hidden="true"></i><div><h3>Saved moments are coming next</h3><p>For now, bookmark individual dishes and places to build your Savour list.</p></div><a class="arrow-link" href="/recipes">Explore dishes <i data-lucide="arrow-right" aria-hidden="true"></i></a></div></div>
+    <div class="saved-panel" id="saved-dishes" role="tabpanel" data-saved-panel="dishes" <%= defaultSavedTab !== 'dishes' ? 'hidden' : '' %>>
+      <% if (savedRecipes.length) { %><div class="saved-item-grid"><% savedRecipes.forEach(recipe => { %><article class="saved-item"><img src="/images/recipes/web/<%= recipe.image %>" alt="<%= recipe.title %>" width="900" height="900" loading="lazy"><div><span><%= recipe.group %></span><h3><%= recipe.title %></h3><a href="/recipes?q=<%= encodeURIComponent(recipe.title) %>#recipe-finder">Open dish</a></div></article><% }) %></div><% } else { %><div class="saved-empty"><i data-lucide="bookmark" aria-hidden="true"></i><div><h3>No dishes bookmarked yet</h3><p>Save recipes you want to cook or return to later.</p></div><a class="arrow-link" href="/recipes">Explore dishes <i data-lucide="arrow-right" aria-hidden="true"></i></a></div><% } %>
+    </div>
+    <div class="saved-panel" id="saved-places" role="tabpanel" data-saved-panel="places" <%= defaultSavedTab !== 'places' ? 'hidden' : '' %>>
+      <% if (savedRestaurants.length) { %><div class="restaurant-grid"><% savedRestaurants.forEach((restaurant, index) => { %><%- include('./components/restaurant-card', { restaurant, index }) %><% }) %></div><% } else { %><div class="saved-empty"><i data-lucide="map-pin" aria-hidden="true"></i><div><h3>No restaurants bookmarked yet</h3><p>Save places you want to discover or visit again.</p></div><a class="arrow-link" href="/restaurants">Find restaurants <i data-lucide="arrow-right" aria-hidden="true"></i></a></div><% } %>
+    </div>
+  </div>
+</section>
+<% } else { %>
+
 <section class="discovery-hero" data-hero-slider aria-roledescription="carousel" aria-label="Abuja dining scenes">
   <div class="hero-slides" aria-live="off">
     <img class="hero-media hero-slide is-active" src="/images/discovery-hero.jpg" alt="Friends dining at a welcoming city restaurant in the evening" width="1536" height="864" fetchpriority="high" data-hero-slide>
@@ -46,7 +70,7 @@
 
 <section class="journal-band">
   <div class="page-shell journal-layout">
-    <div class="journal-copy"><p class="eyebrow eyebrow-light">Your dining journal</p><h2>Remember more than the rating.</h2><p>Keep track of the dishes, conversations, and little details that made a place matter.</p><a class="button button-light" href="<%= currentUser ? '/restaurants?view=visited' : '/login' %>">Open your journal</a></div>
+    <div class="journal-copy"><p class="eyebrow eyebrow-light">Your dining journal</p><h2>Remember more than the rating.</h2><p>Keep track of the dishes, conversations, and little details that made a place matter.</p><a class="button button-light" href="<%= currentUser ? '/restaurants?view=visited' : '/login' %>"><%= currentUser ? 'Open your journal' : 'Log in to open your journal' %></a></div>
     <div class="memory-list" aria-label="Journal examples">
       <article><span>01</span><div><h3>The dish</h3><p>What you ordered and what you would return for.</p></div></article>
       <article><span>02</span><div><h3>The moment</h3><p>A date, a celebration, or a quiet meal on your own.</p></div></article>
@@ -54,3 +78,4 @@
     </div>
   </div>
 </section>
+<% } %>

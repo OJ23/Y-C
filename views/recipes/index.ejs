@@ -1,0 +1,44 @@
+<% layout('./layouts/boilerplate') %>
+
+<section class="recipe-finder recipe-finder-page" id="recipe-finder" aria-labelledby="recipe-finder-title">
+  <div class="page-shell recipe-finder-layout">
+    <div class="recipe-finder-copy">
+      <p class="eyebrow eyebrow-light">Cook with what you have</p>
+      <h1 id="recipe-finder-title">Find your next recipe.</h1>
+      <p>Search authentic Nigerian dishes by name, ingredient, or category.</p>
+      <form class="recipe-search" action="/recipes#recipe-finder" method="get" role="search" data-search-suggest="/recipes/suggestions">
+        <label class="sr-only" for="recipe-query">Search recipes</label>
+        <i data-lucide="search" aria-hidden="true"></i>
+        <input id="recipe-query" name="q" type="search" value="<%= recipeQuery %>" placeholder="Try chicken, rice, egusi..." autocomplete="off" aria-autocomplete="list" aria-controls="recipe-suggestions" aria-expanded="false">
+        <button type="submit">Find recipes</button>
+        <div class="search-suggestions" id="recipe-suggestions" role="listbox" hidden data-search-suggestions></div>
+      </form>
+      <p class="recipe-status" role="status" aria-live="polite"><%= recipeQuery ? `${totalRecipes} recipe${totalRecipes === 1 ? '' : 's'} found for “${recipeQuery}”` : `Showing all ${totalRecipes} recipes by classification` %></p>
+    </div>
+
+    <% const recipeCategories = ['Swallow', 'Assorted', 'Fried', 'Drinks', 'Coffee', 'Cocktails']; %>
+    <div class="recipe-category-tabs" role="tablist" aria-label="Recipe categories">
+      <button class="is-active" type="button" role="tab" aria-selected="true" data-recipe-category="All"><i data-lucide="layout-grid" aria-hidden="true"></i>All <span><%= totalRecipes %></span></button>
+      <% recipeCategories.forEach(categoryName => { const categoryCount = recipeCategoryCounts[categoryName] || 0; %><button class="category-<%= categoryName.toLowerCase() %>" type="button" role="tab" aria-selected="false" data-recipe-category="<%= categoryName %>"><i data-lucide="<%= categoryName === 'Swallow' ? 'soup' : categoryName === 'Assorted' ? 'beef' : categoryName === 'Fried' ? 'flame' : categoryName === 'Coffee' ? 'coffee' : 'glass-water' %>" aria-hidden="true"></i><%= categoryName %> <span><%= categoryCount %></span></button><% }) %>
+    </div>
+
+    <div data-recipe-results>
+      <% recipeCategories.forEach((groupName, groupIndex) => { const groupedRecipes = recipes.filter(recipe => recipe.group === groupName); const visibleRecipes = groupedRecipes.slice(0, 6); const groupQuery = recipeQuery ? `?q=${encodeURIComponent(recipeQuery)}` : ''; %>
+        <% if (groupedRecipes.length) { %>
+          <section class="recipe-group group-<%= groupName.toLowerCase() %>" aria-labelledby="recipe-group-<%= groupName.toLowerCase() %>" data-recipe-group="<%= groupName %>">
+            <div class="recipe-group-heading">
+              <span><%= String(groupIndex + 1).padStart(2, '0') %></span>
+              <h2 id="recipe-group-<%= groupName.toLowerCase() %>"><%= groupName %></h2>
+              <a href="/recipes/group/<%= groupName.toLowerCase() %><%= groupQuery %>">Show more<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="recipe-grid">
+              <% visibleRecipes.forEach(recipe => { %><%- include('../components/recipe-card', { recipe }) %><% }) %>
+            </div>
+          </section>
+        <% } %>
+      <% }) %>
+      <div class="recipe-category-empty" hidden data-recipe-category-empty><i data-lucide="chef-hat" aria-hidden="true"></i><h2>No recipes in this classification</h2><p>Try another category or search phrase.</p></div>
+      <% if (!recipes.length) { %><div class="recipe-empty"><i data-lucide="search-x" aria-hidden="true"></i><h2>No recipes found</h2><p>Try another dish or ingredient.</p></div><% } %>
+    </div>
+  </div>
+</section>

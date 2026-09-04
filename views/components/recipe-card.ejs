@@ -1,0 +1,17 @@
+<article class="recipe-card" data-recipe-card>
+  <% const recipeIsSaved = typeof savedRecipeIds !== 'undefined' && savedRecipeIds instanceof Set && savedRecipeIds.has(String(recipe._id)); %>
+  <% if (currentUser) { %><form class="card-save-form" action="/bookmarks/recipe/<%= recipe._id %>" method="post"><input type="hidden" name="returnTo" value="<%= currentUrl %>"><button class="recipe-save-button" type="submit" aria-label="<%= recipeIsSaved ? 'Remove' : 'Save' %> <%= recipe.title %>" aria-pressed="<%= recipeIsSaved %>" title="<%= recipeIsSaved ? 'Remove bookmark' : 'Save dish' %>"><i data-lucide="bookmark" aria-hidden="true"></i></button></form><% } else { %><a class="recipe-save-button" href="/login" aria-label="Log in to save <%= recipe.title %>" title="Log in to save"><i data-lucide="bookmark" aria-hidden="true"></i></a><% } %>
+  <img class="recipe-card-image" src="/images/recipes/web/<%= recipe.image %>" alt="<%= recipe.title %>" width="900" height="900" loading="lazy">
+  <div class="recipe-card-body">
+    <p class="eyebrow"><%= recipe.category %></p>
+    <h2><%= recipe.title %></h2>
+    <p><%= recipe.summary %></p>
+    <details>
+      <summary>Ingredients and method</summary>
+      <h3>Ingredients</h3>
+      <ul><% recipe.ingredients.forEach(ingredient => { %><li><%= ingredient %></li><% }) %></ul>
+      <h3>Preparation</h3>
+      <p><%= recipe.process %></p>
+    </details>
+  </div>
+</article>

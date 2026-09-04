@@ -2,11 +2,13 @@
   <a class="restaurant-image-link" href="/restaurants/<%= restaurant._id %>" aria-label="View <%= restaurant.title %>">
     <img src="<%= restaurant.images && restaurant.images.length ? restaurant.images[0].url : '/images/discovery-hero.jpg' %>" alt="<%= restaurant.images && restaurant.images.length ? restaurant.title : 'Evening restaurant scene used as a placeholder for ' + restaurant.title %>" width="640" height="480" loading="lazy">
   </a>
-  <button class="save-button" type="button" aria-label="Save <%= restaurant.title %>" aria-pressed="false" data-save-restaurant="<%= restaurant._id %>" title="Save restaurant"><i data-lucide="bookmark" aria-hidden="true"></i></button>
+  <% const restaurantIsSaved = typeof savedRestaurantIds !== 'undefined' && savedRestaurantIds instanceof Set && savedRestaurantIds.has(String(restaurant._id)); %>
+  <% if (currentUser) { %><form class="card-save-form" action="/bookmarks/restaurant/<%= restaurant._id %>" method="post"><input type="hidden" name="returnTo" value="<%= currentUrl %>"><button class="save-button" type="submit" aria-label="<%= restaurantIsSaved ? 'Remove' : 'Save' %> <%= restaurant.title %>" aria-pressed="<%= restaurantIsSaved %>" title="<%= restaurantIsSaved ? 'Remove bookmark' : 'Save place' %>"><i data-lucide="bookmark" aria-hidden="true"></i></button></form><% } else { %><a class="save-button" href="/login" aria-label="Log in to save <%= restaurant.title %>" title="Log in to save"><i data-lucide="bookmark" aria-hidden="true"></i></a><% } %>
   <div class="restaurant-card-body">
     <div class="restaurant-meta"><span><i data-lucide="map-pin" aria-hidden="true"></i><%= restaurant.location || 'Location coming soon' %></span><span><%= restaurant.category ? restaurant.category.charAt(0).toUpperCase() + restaurant.category.slice(1) : (restaurant.price ? '$'.repeat(Math.min(Math.max(restaurant.price, 1), 4)) : 'Local favourite') %></span></div>
     <h3><a href="/restaurants/<%= restaurant._id %>"><%= restaurant.title %></a></h3>
     <p><%= restaurant.description ? restaurant.description.substring(0, 105) + (restaurant.description.length > 105 ? '…' : '') : 'A place waiting to be discovered.' %></p>
+    <% if ((restaurant.tags && restaurant.tags.length) || (restaurant.mealTags && restaurant.mealTags.length)) { %><div class="card-tags"><% [...(restaurant.tags || []), ...(restaurant.mealTags || [])].slice(0, 3).forEach(tag => { %><span><%= tag %></span><% }) %></div><% } %>
     <div class="restaurant-card-footer"><span class="rating"><i data-lucide="star" aria-hidden="true"></i><%= restaurant.rating || 'New' %></span><a href="/restaurants/<%= restaurant._id %>">View place <i data-lucide="arrow-right" aria-hidden="true"></i></a></div>
   </div>
 </article>

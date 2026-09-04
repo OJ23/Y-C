@@ -42,6 +42,7 @@ router.route('/')
 
 
 router.get('/new', isLoggedIn,restaurant.newForm);
+router.get('/suggestions', catchAsync(restaurant.suggestions));
 
 router.route('/:id')
     .get(catchAsync(restaurant.getRestaurant))

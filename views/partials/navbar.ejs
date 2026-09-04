@@ -1,11 +1,11 @@
 <header class="site-header">
   <div class="nav-shell">
     <a class="brand" href="/" aria-label="Savour home"><span class="brand-mark">S</span><span>Savour</span></a>
-    <button class="icon-button nav-toggle" type="button" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false" data-nav-toggle><i data-lucide="menu" aria-hidden="true"></i><span class="menu-fallback" aria-hidden="true"></span></button>
     <nav class="primary-nav" id="primary-nav" aria-label="Primary navigation" data-nav>
-      <a class="<%= currentPath === '/' ? 'is-active' : '' %>" href="/">Discover</a>
-      <a class="<%= currentPath.startsWith('/restaurants') && currentPath !== '/restaurants/new' ? 'is-active' : '' %>" href="/restaurants">Explore map</a>
-      <% if (currentUser) { %><a href="/restaurants?view=visited">Visited</a><a href="/restaurants?view=saved">Saved</a><% } %>
+      <a class="nav-discover <%= currentPath === '/' && !currentUser ? 'is-active' : '' %>" href="/">Discover</a>
+      <a class="nav-map <%= currentPath.startsWith('/restaurants') && currentPath !== '/restaurants/new' && !currentUrl.includes('view=') ? 'is-active' : '' %>" href="/restaurants">Map</a>
+      <a class="nav-recipes <%= currentPath === '/recipes' ? 'is-active' : '' %>" href="/recipes">Dishes</a>
+      <% if (currentUser) { %><a class="nav-member-link <%= currentUrl.includes('view=visited') ? 'is-active' : '' %>" href="/restaurants?view=visited">Visited</a><a class="nav-member-link <%= currentPath === '/' ? 'is-active' : '' %>" href="/?tab=places#bookmarks">Saved</a><% } %>
     </nav>
     <div class="nav-actions">
       <% if (!currentUser) { %>

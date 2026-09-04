@@ -1,0 +1,20 @@
+<% layout('./layouts/boilerplate') %>
+
+<section class="recipe-finder recipe-collection-page" aria-labelledby="recipe-collection-title">
+  <div class="page-shell recipe-finder-layout">
+    <header class="recipe-collection-header">
+      <a class="recipe-back-link" href="/recipes<%= recipeQuery ? `?q=${encodeURIComponent(recipeQuery)}` : '' %>#recipe-finder"><i data-lucide="arrow-left" aria-hidden="true"></i>Back to dishes</a>
+      <p class="eyebrow eyebrow-light">Recipe classification</p>
+      <h1 id="recipe-collection-title"><%= recipeGroup %></h1>
+      <p><%= recipes.length %> <%= recipes.length === 1 ? 'dish' : 'dishes' %> in this collection<%= recipeQuery ? ` matching “${recipeQuery}”` : '' %>.</p>
+    </header>
+
+    <% if (recipes.length) { %>
+      <div class="recipe-library-grid">
+        <% recipes.forEach(recipe => { %><%- include('../components/recipe-card', { recipe }) %><% }) %>
+      </div>
+    <% } else { %>
+      <div class="recipe-empty"><i data-lucide="search-x" aria-hidden="true"></i><h2>No recipes found</h2><p>Return to dishes and try another search phrase.</p></div>
+    <% } %>
+  </div>
+</section>

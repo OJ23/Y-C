@@ -1,24 +1,28 @@
 <% layout('./layouts/boilerplate') %>
 
+<div class="discover-intro-band">
 <section class="discover-header page-shell">
-  <div><p class="eyebrow">Restaurant discovery</p><h1><%= query ? 'Results for “' + query + '”' : 'Find your next table' %></h1><p><%= restaurants.length %> <%= restaurants.length === 1 ? 'place' : 'places' %> to explore</p></div>
+  <div><p class="eyebrow"><%= view === 'visited' ? 'Your dining history' : view === 'saved' ? 'Your bookmarks' : 'Restaurant discovery' %></p><% if (!query && view === 'all') { %><h1 class="discover-rotating-title"><span>Find your next&nbsp;</span><span class="rotating-word" aria-hidden="true"><span class="rotating-word-table">table</span><span class="rotating-word-meal">meal</span></span><span class="sr-only">table or meal</span></h1><% } else { %><h1><%= query ? 'Results for “' + query + '”' : view === 'visited' ? 'Places you have visited' : 'Places you have saved' %></h1><% } %><p><%= totalRestaurants %> <%= totalRestaurants === 1 ? 'place' : 'places' %><%= view === 'all' ? ' to explore' : '' %></p></div>
   <% if (currentUser) { %><a class="button button-secondary" href="/restaurants/new"><i data-lucide="plus" aria-hidden="true"></i>Add a restaurant</a><% } %>
 </section>
 
 <div class="discovery-tools page-shell">
-  <form class="discover-search" action="/restaurants" method="get" role="search">
+  <form class="discover-search" action="/restaurants" method="get" role="search" data-search-suggest="/restaurants/suggestions">
+    <% if (view !== 'all') { %><input type="hidden" name="view" value="<%= view %>"><% } %>
     <label class="sr-only" for="discover-search">Search restaurants</label><i data-lucide="search" aria-hidden="true"></i>
-    <input id="discover-search" name="q" type="search" value="<%= query %>" placeholder="Restaurant, food, or neighborhood">
-    <% if (query) { %><a class="clear-search" href="/restaurants" aria-label="Clear search"><i data-lucide="x" aria-hidden="true"></i></a><% } %>
+    <input id="discover-search" name="q" type="search" value="<%= query %>" placeholder="Restaurant, food, or neighborhood" autocomplete="off" aria-autocomplete="list" aria-controls="restaurant-suggestions" aria-expanded="false">
+    <% if (query) { %><a class="clear-search" href="/restaurants<%= view !== 'all' ? '?view=' + view : '' %>" aria-label="Clear search"><i data-lucide="x" aria-hidden="true"></i></a><% } %>
     <button class="button button-primary" type="submit">Search</button>
+    <div class="search-suggestions" id="restaurant-suggestions" role="listbox" hidden data-search-suggestions></div>
   </form>
   <div class="filter-row" aria-label="Quick filters">
-    <% ['Near me', 'Highly rated', 'Budget friendly', 'Open late'].forEach(filter => { %><a class="filter-chip" href="/restaurants?q=<%= encodeURIComponent(filter) %>"><%= filter %></a><% }) %>
+    <% ['Good for dates', 'Late night food', 'Hidden gems', 'Near me', 'Luxury', 'Casual', 'Fast food', 'Budget friendly', 'Street food', 'Instagrammable', 'Work friendly', 'Pet friendly'].forEach(filter => { %><a class="filter-chip" href="/restaurants?<%= view !== 'all' ? 'view=' + view + '&' : '' %>q=<%= encodeURIComponent(filter) %>"><%= filter %></a><% }) %>
   </div>
   <div class="view-toggle" role="group" aria-label="Results view">
     <button class="is-active" type="button" data-view="list"><i data-lucide="list" aria-hidden="true"></i>List</button>
     <button type="button" data-view="map"><i data-lucide="map" aria-hidden="true"></i>Map</button>
   </div>
+</div>
 </div>
 
 <section class="results-layout" data-results-layout>
@@ -27,8 +31,15 @@
       <div class="results-list">
         <% restaurants.forEach((restaurant, index) => { %><%- include('../components/restaurant-card', { restaurant, index }) %><% }) %>
       </div>
+      <% if (totalPages > 1) { const queryPrefix = `${view !== 'all' ? `view=${view}&` : ''}${query ? `q=${encodeURIComponent(query)}&` : ''}`; %>
+        <nav class="pagination-actions" aria-label="Restaurant result pages">
+          <% if (currentPage > 1) { %><a class="show-more-link show-more-secondary" href="/restaurants?<%= queryPrefix %>page=<%= currentPage - 1 %>"><i data-lucide="arrow-left" aria-hidden="true"></i>Previous</a><% } %>
+          <span>Page <%= currentPage %> of <%= totalPages %></span>
+          <% if (currentPage < totalPages) { %><a class="show-more-link" href="/restaurants?<%= queryPrefix %>page=<%= currentPage + 1 %>">Show more restaurants<i data-lucide="arrow-right" aria-hidden="true"></i></a><% } %>
+        </nav>
+      <% } %>
     <% } else { %>
-      <div class="empty-state"><i data-lucide="search-x" aria-hidden="true"></i><h2>No places found</h2><p>Try a restaurant name, neighborhood, or a broader phrase.</p><a class="button button-secondary" href="/restaurants">Clear search</a></div>
+      <div class="empty-state"><i data-lucide="search-x" aria-hidden="true"></i><h2><%= view === 'visited' ? 'No visited places yet' : view === 'saved' ? 'No saved places yet' : 'No places found' %></h2><p><%= view === 'visited' ? 'Mark a place as visited from its page, or tick Visited when you create it.' : view === 'saved' ? 'Bookmark a place and it will appear here immediately.' : 'Try a restaurant name, neighborhood, or a broader phrase.' %></p><a class="button button-secondary" href="/restaurants"><%= view === 'all' ? 'Clear search' : 'Explore places' %></a></div>
     <% } %>
   </div>
   <aside class="map-panel" aria-label="Restaurant map" data-map-panel><div id="map" class="discovery-map"></div><div class="map-caption"><i data-lucide="info" aria-hidden="true"></i><span>The result list provides an accessible alternative to the map.</span></div></aside>

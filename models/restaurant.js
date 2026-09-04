@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const  Schema = mongoose.Schema;
 const Review = require('./review');
 const { coordinates } = require('@maptiler/client');
+const { restaurantTags, mealTags } = require('../data/restaurantTags');
 
 
 
@@ -22,6 +23,8 @@ const restaurantSchema = new Schema({
     category: String,
     venueType: String,
     cuisine: String,
+    tags: [{ type: String, enum: restaurantTags }],
+    mealTags: [{ type: String, enum: mealTags }],
     phone: String,
     website: String,
     openingHours: String,
@@ -56,6 +59,8 @@ const restaurantSchema = new Schema({
         }
     ]
 });
+
+restaurantSchema.index({ geometry: '2dsphere' });
 
 // const restaurantSchema = new Schema({
 //     title: { type: String, required: true },

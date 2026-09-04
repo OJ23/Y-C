@@ -1,0 +1,20 @@
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const catchAsync = require('../utilities/catchasync');
+const auth = require('../controllers/apiV1Auth');
+const apiAuth = require('../middleware/apiAuth');
+const content = require('../controllers/apiV1Content');
+const legacyApi = require('../controllers/api');
+
+const router = express.Router();
+const authLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
+router.post('/auth/login', authLimit, auth.login);
+router.post('/auth/refresh', authLimit, catchAsync(auth.refresh));
+router.post('/auth/logout', authLimit, catchAsync(auth.logout));
+router.get('/auth/me', apiAuth, auth.me);
+router.get('/feed', (req, res, next) => req.get('authorization') ? apiAuth(req, res, next) : next(), catchAsync(content.feed));
+router.get('/bookmarks', apiAuth, catchAsync(content.listBookmarks));
+router.post('/bookmarks', apiAuth, catchAsync(content.addBookmark));
+router.delete('/bookmarks/:type/:entityId', apiAuth, catchAsync(content.removeBookmark));
+router.post('/restaurants', apiAuth, catchAsync(legacyApi.createRestaurant));
+module.exports = router;
